@@ -1,0 +1,19 @@
+{
+  "name": "brokelock",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Commitment savings vault on Monad — early withdrawal costs you a penalty, paid to your accountability partner.",
+  "type": "module",
+  "scripts": {
+    "compile": "node scripts/compile.mjs",
+    "wallet": "node scripts/wallet.mjs",
+    "deploy": "node scripts/deploy.mjs",
+    "test": "node scripts/test.mjs",
+    "verify": "node scripts/verify.mjs"
+  },
+  "devDependencies": {
+    "solc": "0.8.28",
+    "viem": "^2.21.0",
+    "dotenv": "^16.4.5"
+  }
+}
