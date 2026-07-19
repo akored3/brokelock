@@ -462,9 +462,42 @@ a { color: inherit; }
 
 .app-main { display: grid; gap: 18px; }
 
+/* liquid glass: translucent fill + backdrop refraction + specular top edge */
+.glass {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.07),
+    rgba(255, 255, 255, 0.02) 45%,
+    rgba(110, 84, 255, 0.05)
+  );
+  backdrop-filter: blur(18px) saturate(1.5);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  border: 1px solid rgba(221, 215, 254, 0.16);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(4, 2, 12, 0.35),
+    0 20px 45px rgba(4, 2, 12, 0.45);
+}
+.glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(
+    120% 60% at 18% 0%,
+    rgba(255, 255, 255, 0.09),
+    transparent 55%
+  );
+  pointer-events: none;
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .glass { background: var(--surface); }
+}
+
 .panel {
-  background: var(--surface);
-  border: 1px solid var(--line);
   border-radius: 16px;
   padding: 26px;
 }
@@ -487,9 +520,7 @@ a { color: inherit; }
   gap: 8px 34px;
   padding: 14px 20px;
   margin-top: 10px;
-  border: 1px solid var(--line);
   border-radius: 12px;
-  background: rgba(23, 17, 48, 0.75);
   font-size: 0.74rem;
   letter-spacing: 0.06em;
   color: var(--ink-soft);
@@ -512,12 +543,14 @@ a { color: inherit; }
   gap: 12px;
   flex-wrap: wrap;
   padding: 10px 16px;
-  border: 1px solid #251d47;
   border-radius: 10px;
   margin-bottom: 6px;
-  background: rgba(23, 17, 48, 0.6);
   color: var(--ink-soft);
   font-size: 0.86rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(221, 215, 254, 0.09);
 }
 .settled-name { font-weight: 600; color: #8d84b8; }
 .settled-detail { font-size: 0.74rem; }
@@ -571,7 +604,7 @@ a { color: inherit; }
 .goal-form input {
   font: inherit;
   font-size: 0.95rem;
-  background: var(--bg);
+  background: rgba(10, 6, 22, 0.55);
   border: 1px solid var(--line);
   border-radius: 10px;
   color: var(--ink);
@@ -640,14 +673,12 @@ a { color: inherit; }
 .goals { display: grid; gap: 16px; }
 
 .goal {
-  background: var(--surface);
-  border: 1px solid var(--line);
   border-radius: 16px;
   padding: 24px 26px;
 }
 
-.goal.is-locked { border-color: #4a3d8f; }
-.goal.is-open { border-color: #2e5f74; }
+.goal.is-locked { border-color: rgba(110, 84, 255, 0.45); }
+.goal.is-open { border-color: rgba(133, 230, 255, 0.4); }
 
 .goal-head {
   display: flex;
@@ -709,7 +740,7 @@ a { color: inherit; }
   font-family: var(--font-mono);
   font-size: 0.9rem;
   width: 110px;
-  background: var(--bg);
+  background: rgba(10, 6, 22, 0.55);
   border: 1px solid var(--line);
   border-radius: 10px;
   color: var(--ink);
@@ -744,10 +775,17 @@ a { color: inherit; }
   justify-content: space-between;
   gap: 18px;
   flex-wrap: wrap;
-  background: #10283a;
-  border: 1px solid #2e5f74;
   border-radius: 16px;
   padding: 24px 26px;
+}
+.claim-panel.glass {
+  background: linear-gradient(
+    135deg,
+    rgba(133, 230, 255, 0.1),
+    rgba(133, 230, 255, 0.02) 55%,
+    rgba(110, 84, 255, 0.05)
+  );
+  border-color: rgba(133, 230, 255, 0.3);
 }
 .claim-sub { color: var(--ink-soft); margin-top: 4px; }
 .claim-sub strong { color: var(--cyan); }

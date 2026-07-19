@@ -224,7 +224,7 @@ export default function App() {
                   <AnimatePresence>
                     {claimable > 0n && (
                       <motion.section
-                        className="claim-panel"
+                        className="claim-panel glass"
                         initial={{ opacity: 0, y: -12, scale: 0.98 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -12, scale: 0.98 }}
@@ -275,7 +275,7 @@ function Spinner() {
 function VaultBar({ totalLocked, claimable, burned }) {
   return (
     <motion.div
-      className="vaultbar mono"
+      className="vaultbar glass mono"
       initial={{ opacity: 0, y: -8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.1, ease: EASE }}
@@ -444,7 +444,7 @@ function CreateGoal({ busy, send, now }) {
   }
 
   return (
-    <section className="panel create-panel">
+    <section className="panel glass create-panel">
       <h2>New commitment</h2>
       <form className="goal-form" onSubmit={submit}>
         <label>
@@ -526,7 +526,7 @@ function GoalList({ goals, now, busy, send }) {
   if (goals.length === 0) {
     return (
       <motion.section
-        className="panel empty"
+        className="panel glass empty"
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.1, ease: EASE }}
@@ -598,7 +598,7 @@ function GoalRow({ goal, goalId, now, busy, send }) {
 
   return (
     <motion.article
-      className={`goal ${early ? 'is-locked' : 'is-open'}`}
+      className={`goal glass ${early ? 'is-locked' : 'is-open'}`}
       layout
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
