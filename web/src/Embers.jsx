@@ -46,7 +46,7 @@ export default function Embers({ density = 30 }) {
         const alpha = p.a * (0.55 + 0.45 * Math.sin(t * 1.8 + p.tw));
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, 7);
-        ctx.fillStyle = `rgba(240, 178, 65, ${Math.max(alpha, 0)})`;
+        ctx.fillStyle = `rgba(190, 172, 255, ${Math.max(alpha, 0)})`;
         ctx.fill();
       }
     };

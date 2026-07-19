@@ -174,7 +174,7 @@ export default function App() {
                 {short(account)}
               </motion.span>
             ) : (
-              <motion.button className="btn btn-amber" onClick={connect} whileTap={{ scale: 0.96 }}>
+              <motion.button className="btn btn-accent" onClick={connect} whileTap={{ scale: 0.96 }}>
                 Connect wallet
               </motion.button>
             )}
@@ -318,7 +318,7 @@ function Landing({ onConnect, burned }) {
             transition={{ duration: 0.8, delay: 0.28, ease: EASE }}
           >
             <motion.button
-              className="btn btn-amber btn-big"
+              className="btn btn-accent btn-big"
               onClick={onConnect}
               whileHover={{ y: -2 }}
               whileTap={{ scale: 0.96 }}
@@ -498,7 +498,7 @@ function CreateGoal({ busy, send, now }) {
             onChange={(e) => setPartner(e.target.value)}
           />
         </label>
-        <motion.button className="btn btn-amber" disabled={busy !== null} whileTap={{ scale: 0.97 }}>
+        <motion.button className="btn btn-accent" disabled={busy !== null} whileTap={{ scale: 0.97 }}>
           {busy === 'create' ? <Spinner /> : 'Commit onchain'}
         </motion.button>
       </form>
