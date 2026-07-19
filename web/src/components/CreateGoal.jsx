@@ -5,6 +5,7 @@ import { ZERO } from '../lib/format.js';
 import { fadeRiseSm, springSnappy } from '../lib/motion.js';
 import Button from './ui/Button.jsx';
 import Spinner from './ui/Spinner.jsx';
+import DateTimeField from './ui/DateTimeField.jsx';
 
 const Label = ({ children }) => (
   <span className="font-mono text-[0.62rem] uppercase tracking-[0.16em] text-ink-dim">
@@ -68,17 +69,10 @@ export default function CreateGoal({ busy, send, now }) {
           />
         </label>
 
-        <label className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2">
           <Label>Locked until</Label>
-          <input
-            required
-            type="datetime-local"
-            className="field font-mono text-sm"
-            min={minLocal}
-            value={deadline}
-            onChange={(e) => setDeadline(e.target.value)}
-          />
-        </label>
+          <DateTimeField value={deadline} onChange={setDeadline} min={minLocal} />
+        </div>
 
         <label className="flex flex-col gap-2.5">
           <span className="flex items-center justify-between">
