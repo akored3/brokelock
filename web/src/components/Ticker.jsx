@@ -11,7 +11,7 @@ function Run({ burned, ariaHidden }) {
       className="flex items-center gap-7 whitespace-nowrap pl-7 font-mono text-[0.67rem] uppercase tracking-[0.18em] text-ink-faint"
     >
       <span className="flex items-center gap-2 text-ink">
-        <Flame size={12} className="shrink-0 text-iris-bright" />
+        <Flame size={12} className="flame-flicker shrink-0 text-iris-bright" />
         {fmt(burned, 4)} MON burned by the undisciplined
       </span>
       <Sep />

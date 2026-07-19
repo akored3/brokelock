@@ -18,7 +18,7 @@ export default function Hero({ onConnect }) {
           variants={fadeRise}
           className="glass inline-flex items-center gap-2 rounded-full px-4 py-1.5 font-mono text-[0.65rem] uppercase tracking-[0.18em] text-ink-dim"
         >
-          <Flame size={12} className="text-iris-bright" />
+          <Flame size={12} className="flame-flicker text-iris-bright" />
           Savings with consequences
         </motion.span>
 

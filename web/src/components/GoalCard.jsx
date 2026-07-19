@@ -129,7 +129,7 @@ export default function GoalCard({ goal, goalId, now, busy, send, onDelete }) {
         </span>
         {burnsPenalty ? (
           <span className="inline-flex items-center gap-1.5">
-            <Flame size={13} className="shrink-0 text-danger" />
+            <Flame size={13} className="flame-flicker shrink-0 text-danger" />
             Penalty burns
           </span>
         ) : (

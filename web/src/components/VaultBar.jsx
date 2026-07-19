@@ -6,7 +6,7 @@ import { fadeRiseSm, springSnappy } from '../lib/motion.js';
 const CELLS = [
   { id: 'locked', label: 'Locked', Icon: Lock, iconCls: 'text-iris-bright' },
   { id: 'owed', label: 'Owed to you', Icon: HandCoins, iconCls: 'text-success' },
-  { id: 'burned', label: 'Burned (global)', Icon: Flame, iconCls: 'text-danger' },
+  { id: 'burned', label: 'Burned (global)', Icon: Flame, iconCls: 'flame-flicker text-danger' },
 ];
 
 export default function VaultBar({ totalLocked, claimable, burned }) {
