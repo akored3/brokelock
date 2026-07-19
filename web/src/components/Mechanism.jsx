@@ -4,7 +4,7 @@ import { fadeRise, staggerParent, viewportOnce } from '../lib/motion.js';
 
 const STEPS = [
   {
-    n: '01',
+    img: '/steps/commit.png',
     Icon: FileSignature,
     title: 'Commit',
     body: (
@@ -15,7 +15,7 @@ const STEPS = [
     ),
   },
   {
-    n: '02',
+    img: '/steps/stack.png',
     Icon: Coins,
     title: 'Stack',
     body: (
@@ -26,7 +26,7 @@ const STEPS = [
     ),
   },
   {
-    n: '03',
+    img: '/steps/hold.png',
     Icon: ShieldCheck,
     title: 'Hold the line',
     body: (
@@ -47,16 +47,20 @@ export default function Mechanism() {
       whileInView="show"
       viewport={viewportOnce}
     >
-      {STEPS.map(({ n, Icon, title, body }) => (
+      {STEPS.map(({ img, Icon, title, body }) => (
         <motion.article
-          key={n}
+          key={title}
           variants={fadeRise}
           whileHover={{ y: -4 }}
           className="glass relative overflow-hidden p-6 transition-colors duration-300 hover:[--glass-border:rgba(255,255,255,0.2)]"
         >
-          <span className="pointer-events-none absolute -right-2 -top-5 select-none font-mono text-[5.5rem] font-semibold leading-none text-white/[0.045]">
-            {n}
-          </span>
+          <img
+            src={img}
+            alt=""
+            aria-hidden="true"
+            loading="lazy"
+            className="pointer-events-none absolute -right-3 -top-3 size-28 select-none"
+          />
           <span className="glass glass-tinted mb-5 grid size-11 place-items-center rounded-[14px]">
             <Icon size={19} className="text-iris-bright" />
           </span>
