@@ -9,6 +9,7 @@ import {
   parseEther,
 } from 'viem';
 import { BROKELOCK_ADDRESS, BROKELOCK_ABI, EXPLORER, monadTestnet } from './contract.js';
+import Embers from './Embers.jsx';
 
 const pub = createPublicClient({ chain: monadTestnet, transport: http() });
 
@@ -35,7 +36,7 @@ function countdown(deadline, now) {
 
 export default function App() {
   const [account, setAccount] = useState(null);
-  const [goals, setGoals] = useState([]);
+  const [goals, setGoals] = useState(null);
   const [claimable, setClaimable] = useState(0n);
   const [burned, setBurned] = useState(0n);
   const [busy, setBusy] = useState(null);
@@ -56,7 +57,7 @@ export default function App() {
 
   const say = (kind, text) => {
     setNotice({ kind, text });
-    if (kind !== 'error') setTimeout(() => setNotice(null), 6000);
+    if (kind !== 'error') setTimeout(() => setNotice(null), 7000);
   };
 
   const refresh = useCallback(async (addr) => {
@@ -112,7 +113,7 @@ export default function App() {
     }
   }
 
-  async function send(label, functionName, args, value) {
+  async function send(label, functionName, args, value, okText) {
     setBusy(label);
     setNotice(null);
     try {
@@ -128,6 +129,12 @@ export default function App() {
       const receipt = await pub.waitForTransactionReceipt({ hash });
       if (receipt.status !== 'success') throw new Error('Transaction reverted.');
       await refresh(account);
+      say('ok', (
+        <>
+          {okText ?? 'Confirmed.'}{' '}
+          <a href={`${EXPLORER}/tx/${hash}`} target="_blank" rel="noreferrer">view tx ↗</a>
+        </>
+      ));
       return true;
     } catch (err) {
       say('error', err.shortMessage ?? err.message ?? 'Transaction failed.');
@@ -137,8 +144,16 @@ export default function App() {
     }
   }
 
+  const totalLocked = useMemo(
+    () => (goals ?? []).reduce((acc, g) => acc + g.balance, 0n),
+    [goals],
+  );
+
   return (
     <MotionConfig reducedMotion="user">
+      <Embers density={account ? 20 : 32} />
+      <div className="bg-glow bg-glow-a" aria-hidden="true" />
+      <div className="bg-glow bg-glow-b" aria-hidden="true" />
       <div className={account ? 'shell shell-app' : 'shell'}>
         <header className="topbar">
           <a className="wordmark" href="/">
@@ -170,7 +185,7 @@ export default function App() {
           {notice && (
             <motion.div
               className={`notice notice-${notice.kind}`}
-              onClick={() => setNotice(null)}
+              onClick={() => notice.kind === 'error' && setNotice(null)}
               role="alert"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -182,61 +197,93 @@ export default function App() {
           )}
         </AnimatePresence>
 
-        {!account ? (
-          <Landing onConnect={connect} burned={burned} />
-        ) : (
-          <main className="app">
-            <motion.aside
-              className="app-side"
-              initial={{ opacity: 0, x: -16 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, ease: EASE }}
+        <AnimatePresence mode="wait">
+          {!account ? (
+            <motion.div
+              key="landing"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.35, ease: EASE }}
             >
-              <CreateGoal busy={busy} send={send} now={now} />
-            </motion.aside>
-            <div className="app-main">
-              <AnimatePresence>
-                {claimable > 0n && (
-                  <motion.section
-                    className="claim-panel"
-                    initial={{ opacity: 0, y: -12, scale: 0.98 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -12, scale: 0.98 }}
-                    transition={{ type: 'spring', stiffness: 260, damping: 24 }}
-                  >
-                    <div>
-                      <h2>Your friends folded.</h2>
-                      <p className="claim-sub">
-                        Early-exit penalties owed to you:{' '}
-                        <strong className="mono">{fmt(claimable, 6)} MON</strong>
-                      </p>
-                    </div>
-                    <motion.button
-                      className="btn btn-green"
-                      disabled={busy !== null}
-                      onClick={() => send('claim', 'claim', [])}
-                      whileTap={{ scale: 0.96 }}
-                    >
-                      {busy === 'claim' ? 'Claiming…' : 'Claim it'}
-                    </motion.button>
-                  </motion.section>
-                )}
-              </AnimatePresence>
-              <GoalList goals={goals} now={now} busy={busy} send={send} />
-              <footer className="colophon">
-                <span>
-                  <strong className="mono">{fmt(burned, 6)} MON</strong> burned so far by
-                  savers with no partner and no patience.
-                </span>
-                <a href={`${EXPLORER}/address/${BROKELOCK_ADDRESS}`} target="_blank" rel="noreferrer">
-                  Contract on MonadScan ↗
-                </a>
-              </footer>
-            </div>
-          </main>
-        )}
+              <Landing onConnect={connect} burned={burned} />
+            </motion.div>
+          ) : (
+            <motion.div
+              key="app"
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: EASE }}
+            >
+              <VaultBar totalLocked={totalLocked} claimable={claimable} burned={burned} />
+              <main className="app">
+                <aside className="app-side">
+                  <CreateGoal busy={busy} send={send} now={now} />
+                </aside>
+                <div className="app-main">
+                  <AnimatePresence>
+                    {claimable > 0n && (
+                      <motion.section
+                        className="claim-panel"
+                        initial={{ opacity: 0, y: -12, scale: 0.98 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -12, scale: 0.98 }}
+                        transition={{ type: 'spring', stiffness: 260, damping: 24 }}
+                      >
+                        <div>
+                          <h2>Your friends folded.</h2>
+                          <p className="claim-sub">
+                            Early-exit penalties owed to you:{' '}
+                            <strong className="mono">{fmt(claimable, 6)} MON</strong>
+                          </p>
+                        </div>
+                        <motion.button
+                          className="btn btn-green"
+                          disabled={busy !== null}
+                          onClick={() => send('claim', 'claim', [], undefined, 'Penalties claimed. Enjoy their weakness.')}
+                          whileTap={{ scale: 0.96 }}
+                        >
+                          {busy === 'claim' ? <Spinner /> : 'Claim it'}
+                        </motion.button>
+                      </motion.section>
+                    )}
+                  </AnimatePresence>
+                  <GoalList goals={goals} now={now} busy={busy} send={send} />
+                  <footer className="colophon">
+                    <span>
+                      <strong className="mono">{fmt(burned, 6)} MON</strong> burned so far by
+                      savers with no partner and no patience.
+                    </span>
+                    <a href={`${EXPLORER}/address/${BROKELOCK_ADDRESS}`} target="_blank" rel="noreferrer">
+                      Contract on MonadScan ↗
+                    </a>
+                  </footer>
+                </div>
+              </main>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </MotionConfig>
+  );
+}
+
+function Spinner() {
+  return <span className="spinner" aria-label="pending" />;
+}
+
+function VaultBar({ totalLocked, claimable, burned }) {
+  return (
+    <motion.div
+      className="vaultbar mono"
+      initial={{ opacity: 0, y: -8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.1, ease: EASE }}
+    >
+      <span>LOCKED <b>{fmt(totalLocked, 4)} MON</b></span>
+      <span>OWED TO YOU <b>{fmt(claimable, 4)} MON</b></span>
+      <span>BURNED (ALL) <b>{fmt(burned, 4)} MON</b></span>
+    </motion.div>
   );
 }
 
@@ -351,12 +398,13 @@ function VaultDial() {
       whileHover={{ scale: 1.02 }}
     >
       <div className="vault-outer" />
+      <div className="vault-bolts" />
       <motion.div
         className="vault-spokes"
         initial={{ rotate: -70 }}
         animate={{ rotate: 290 }}
         transition={{
-          rotate: { duration: 90, repeat: Infinity, ease: 'linear' },
+          rotate: { duration: 110, repeat: Infinity, ease: 'linear' },
         }}
       />
       <div className="vault-hub">
@@ -385,6 +433,8 @@ function CreateGoal({ busy, send, now }) {
       'create',
       'createGoal',
       [name.trim(), BigInt(ts), penalty * 100, partner.trim() || ZERO],
+      undefined,
+      'Commitment sealed onchain. No take-backs.',
     );
     if (ok) {
       setName('');
@@ -449,7 +499,7 @@ function CreateGoal({ busy, send, now }) {
           />
         </label>
         <motion.button className="btn btn-amber" disabled={busy !== null} whileTap={{ scale: 0.97 }}>
-          {busy === 'create' ? 'Committing…' : 'Commit onchain'}
+          {busy === 'create' ? <Spinner /> : 'Commit onchain'}
         </motion.button>
       </form>
     </section>
@@ -457,6 +507,22 @@ function CreateGoal({ busy, send, now }) {
 }
 
 function GoalList({ goals, now, busy, send }) {
+  if (goals === null) {
+    return (
+      <div className="goals">
+        <div className="goal skeleton" />
+        <div className="goal skeleton" />
+      </div>
+    );
+  }
+
+  const active = [];
+  const settled = [];
+  goals.forEach((g, i) => {
+    const early = now < Number(g.deadline);
+    (g.balance > 0n || early ? active : settled).push([g, i]);
+  });
+
   if (goals.length === 0) {
     return (
       <motion.section
@@ -473,14 +539,28 @@ function GoalList({ goals, now, busy, send }) {
       </motion.section>
     );
   }
+
   return (
-    <section className="goals">
-      <AnimatePresence initial={false}>
-        {goals.map((g, i) => (
-          <GoalRow key={i} goal={g} goalId={i} now={now} busy={busy} send={send} />
-        ))}
-      </AnimatePresence>
-    </section>
+    <>
+      <section className="goals">
+        <AnimatePresence initial={false}>
+          {active.map(([g, i]) => (
+            <GoalRow key={i} goal={g} goalId={i} now={now} busy={busy} send={send} />
+          ))}
+        </AnimatePresence>
+      </section>
+      {settled.length > 0 && (
+        <section className="settled">
+          <h4 className="settled-title mono">SETTLED</h4>
+          {settled.map(([g, i]) => (
+            <div className="settled-row" key={i}>
+              <span className="settled-name">{g.name}</span>
+              <span className="mono settled-detail">penalty {g.penaltyBps / 100}% · paid out</span>
+            </div>
+          ))}
+        </section>
+      )}
+    </>
   );
 }
 
@@ -497,7 +577,10 @@ function GoalRow({ goal, goalId, now, busy, send }) {
 
   async function depositNow(e) {
     e.preventDefault();
-    const ok = await send(`deposit-${goalId}`, 'deposit', [BigInt(goalId)], parseEther(amount));
+    const ok = await send(
+      `deposit-${goalId}`, 'deposit', [BigInt(goalId)], parseEther(amount),
+      'Deposited. The vault holds it now, not you.',
+    );
     if (ok) setAmount('');
   }
 
@@ -507,7 +590,10 @@ function GoalRow({ goal, goalId, now, busy, send }) {
       return;
     }
     setArmed(false);
-    await send(`withdraw-${goalId}`, 'withdraw', [BigInt(goalId)]);
+    await send(
+      `withdraw-${goalId}`, 'withdraw', [BigInt(goalId)], undefined,
+      early ? 'Withdrawn early. Your friend thanks you for the fine.' : 'Withdrawn in full. Discipline pays.',
+    );
   }
 
   return (
@@ -516,6 +602,7 @@ function GoalRow({ goal, goalId, now, busy, send }) {
       layout
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.97 }}
       transition={{ duration: 0.55, ease: EASE, layout: { type: 'spring', stiffness: 300, damping: 30 } }}
     >
       <div className="goal-head">
@@ -564,7 +651,7 @@ function GoalRow({ goal, goalId, now, busy, send }) {
             onChange={(e) => setAmount(e.target.value)}
           />
           <motion.button className="btn btn-quiet" disabled={busy !== null} whileTap={{ scale: 0.96 }}>
-            {busy === `deposit-${goalId}` ? 'Depositing…' : 'Deposit'}
+            {busy === `deposit-${goalId}` ? <Spinner /> : 'Deposit'}
           </motion.button>
         </form>
         {goal.balance > 0n && (
@@ -592,7 +679,7 @@ function GoalRow({ goal, goalId, now, busy, send }) {
               whileTap={{ scale: 0.96 }}
             >
               {busy === `withdraw-${goalId}`
-                ? 'Withdrawing…'
+                ? <Spinner />
                 : early
                   ? armed ? 'Yes, fine me' : 'Rage-quit early'
                   : 'Withdraw — no penalty'}
