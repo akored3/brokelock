@@ -25,5 +25,22 @@ All state is onchain. No backend, no database, no mock data — the contract is 
 
 ## Contract
 
-- Network: Monad Testnet
-- Address: _(deployment pending)_
+- Network: Monad Testnet (chain id 10143)
+- Address: [`0x52b4f638698000d41f58ff6448538acd98d06b98`](https://testnet.monadscan.com/address/0x52b4f638698000d41f58ff6448538acd98d06b98)
+- Source verified on MonadScan + MonadVision (perfect match)
+- Integration tests: `npm test` — 16 assertions against the live deployment,
+  covering creation, validation reverts, deposits, early-withdrawal penalties,
+  partner claims, and free post-deadline withdrawal.
+
+## Run it yourself
+
+```bash
+npm install
+npm run compile   # solc standard JSON → out/
+npm run wallet    # throwaway key + faucet funding
+npm run deploy    # deploy + point the frontend at it
+npm test          # live integration suite
+npm run verify    # source verification on all explorers
+
+cd web && npm install && npm run dev
+```

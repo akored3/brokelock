@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { readFileSync } from 'node:fs';
-import { createPublicClient, createWalletClient, http, parseEther, formatEther } from 'viem';
+import { createPublicClient, createWalletClient, http, parseEther, formatEther, parseEventLogs } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { monadTestnet, RPC_URL } from './chain.mjs';
 
@@ -14,9 +14,11 @@ const { address } = JSON.parse(readFileSync('out/deployment.json', 'utf8'));
 const saver = privateKeyToAccount(process.env.PRIVATE_KEY);
 const partner = privateKeyToAccount(process.env.PARTNER_KEY);
 
-const pub = createPublicClient({ chain: monadTestnet, transport: http(RPC_URL) });
-const saverWallet = createWalletClient({ account: saver, chain: monadTestnet, transport: http(RPC_URL) });
-const partnerWallet = createWalletClient({ account: partner, chain: monadTestnet, transport: http(RPC_URL) });
+// Public testnet RPC can be flaky — long timeout + retries keep the run honest.
+const transport = () => http(RPC_URL, { timeout: 30_000, retryCount: 5, retryDelay: 2_000 });
+const pub = createPublicClient({ chain: monadTestnet, transport: transport() });
+const saverWallet = createWalletClient({ account: saver, chain: monadTestnet, transport: transport() });
+const partnerWallet = createWalletClient({ account: partner, chain: monadTestnet, transport: transport() });
 
 let passed = 0;
 let failed = 0;
@@ -91,13 +93,15 @@ assert(early === true, 'previewWithdraw flags early');
 assert(penalty === stake / 10n, 'preview penalty = 10%');
 
 const claimBefore = await read('claimable', [partner.address]);
-const saverBefore = await pub.getBalance({ address: saver.address });
-await write(saverWallet, 'withdraw', [goalId]);
+const receipt = await write(saverWallet, 'withdraw', [goalId]);
 const claimAfter = await read('claimable', [partner.address]);
-const saverAfter = await pub.getBalance({ address: saver.address });
 
+// Assert the exact payout from the Withdrawn event — balance deltas are
+// unreliable here because Monad charges gas on gas_limit, not gas used.
+const [withdrawn] = parseEventLogs({ abi, logs: receipt.logs, eventName: 'Withdrawn' });
 assert(claimAfter - claimBefore === penalty, 'penalty credited to partner');
-assert(saverAfter > saverBefore, 'saver received payout minus gas');
+assert(withdrawn.args.paidOut === payout && withdrawn.args.penalty === penalty && withdrawn.args.early === true,
+  'Withdrawn event: exact payout, penalty, early flag');
 goals = await read('goalsOf', [saver.address]);
 assert(goals[Number(goalId)].balance === 0n, 'goal zeroed after withdraw');
 

@@ -34,5 +34,14 @@ const deployment = {
 };
 writeFileSync('out/deployment.json', JSON.stringify(deployment, null, 2));
 
+// Point the frontend at the fresh deployment.
+const contractJs = 'web/src/contract.js';
+const src = readFileSync(contractJs, 'utf8');
+writeFileSync(
+  contractJs,
+  src.replace(/BROKELOCK_ADDRESS = '0x[0-9a-fA-F]{40}'/, `BROKELOCK_ADDRESS = '${receipt.contractAddress}'`),
+);
+
 console.log(`Brokelock deployed at: ${receipt.contractAddress}`);
 console.log(`Explorer: ${deployment.explorer}`);
+console.log(`Frontend contract.js updated.`);
