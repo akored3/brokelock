@@ -2,6 +2,8 @@
 
 **I'm broke because I have zero discipline. So I built a vault that fines me for touching my own money.**
 
+**Live app:** https://brokelock.vercel.app · **Contract:** [`0x52b4...6b98` on MonadScan](https://testnet.monadscan.com/address/0x52b4f638698000d41f58ff6448538acd98d06b98)
+
 Brokelock is a commitment savings vault on [Monad](https://monad.xyz). You create a goal, lock MON toward it, and set a deadline. Withdraw after the deadline: free. Rage-quit early: you pay a penalty that goes to your accountability partner (or gets burned, if you trust no one).
 
 ## The personal problem

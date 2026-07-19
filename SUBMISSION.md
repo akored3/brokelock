@@ -38,7 +38,7 @@ data — the contract is the app.
 
 ## Links
 
-- **Hosted app:** _(pending)_
+- **Hosted app:** https://brokelock.vercel.app
 - **GitHub:** https://github.com/akored3/brokelock
 - **Network:** Monad Testnet (chain id 10143)
 - **Contract:** `0x52b4f638698000d41f58ff6448538acd98d06b98` — [MonadScan](https://testnet.monadscan.com/address/0x52b4f638698000d41f58ff6448538acd98d06b98) (source verified, perfect match)
