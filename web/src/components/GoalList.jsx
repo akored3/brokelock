@@ -14,7 +14,7 @@ function Skeleton() {
 export default function GoalList({ goals, now, busy, send }) {
   if (goals === null) {
     return (
-      <div className="grid gap-5">
+      <div className="grid gap-5 xl:grid-cols-2">
         <Skeleton />
         <Skeleton />
       </div>
@@ -27,6 +27,8 @@ export default function GoalList({ goals, now, busy, send }) {
     const early = now < Number(g.deadline);
     (g.balance > 0n || early ? active : settled).push([g, i]);
   });
+  // most urgent first: passed deadlines (free to withdraw), then soonest upcoming
+  active.sort(([a], [b]) => Number(a.deadline) - Number(b.deadline));
 
   if (goals.length === 0) {
     return (
@@ -50,7 +52,7 @@ export default function GoalList({ goals, now, busy, send }) {
 
   return (
     <>
-      <section className="grid gap-5">
+      <section className="grid items-start gap-5 xl:grid-cols-2">
         <AnimatePresence initial={false}>
           {active.map(([g, i]) => (
             <GoalCard key={i} goal={g} goalId={i} now={now} busy={busy} send={send} />
