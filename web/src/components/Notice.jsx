@@ -10,7 +10,7 @@ const kinds = {
   },
   error: {
     Icon: TriangleAlert,
-    cls: 'border-danger/40 [--glass-bg:rgba(255,90,97,0.07)]',
+    cls: 'border-danger/40 [--glass-bg:rgba(255,90,97,0.07)] [&_a]:font-medium [&_a]:underline',
     iconCls: 'text-danger',
   },
 };

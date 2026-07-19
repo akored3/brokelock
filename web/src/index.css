@@ -11,7 +11,7 @@
   --color-lilac: #ddd7fe;
   --color-ink: #f6f4ff;
   --color-ink-dim: #a89fd0;
-  --color-ink-faint: #7d75a8;
+  --color-ink-faint: #948cbe; /* floor: 4.5:1 over glass surfaces (WCAG AA) */
   --color-success: #85e6ff;
   --color-danger: #ff5a61;
 
@@ -33,7 +33,11 @@
 @layer base {
   html {
     color-scheme: dark;
-    scroll-behavior: smooth;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
   }
   body {
     background-color: var(--color-void);

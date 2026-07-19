@@ -1,10 +1,10 @@
 import { motion } from 'motion/react';
-import { Vault, Wallet, CircleUserRound } from 'lucide-react';
+import { Vault, Wallet, CircleUserRound, LogOut } from 'lucide-react';
 import { short } from '../lib/format.js';
 import { fadeRiseSm, staggerParent, springSnappy } from '../lib/motion.js';
 import Button from './ui/Button.jsx';
 
-export default function Topbar({ account, onConnect }) {
+export default function Topbar({ account, onConnect, onDisconnect }) {
   return (
     <motion.header
       className="sticky top-0 z-40 border-b border-white/[0.06] bg-void/35 backdrop-blur-2xl"
@@ -42,13 +42,22 @@ export default function Topbar({ account, onConnect }) {
           {account ? (
             <motion.span
               title={account}
-              className="glass inline-flex items-center gap-2 rounded-full px-3.5 py-2 font-mono text-xs text-ink"
+              className="glass inline-flex items-center gap-2 rounded-full py-1.5 pl-3.5 pr-1.5 font-mono text-xs text-ink"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={springSnappy}
             >
               <CircleUserRound size={14} className="text-iris-bright" />
               {short(account)}
+              <button
+                type="button"
+                onClick={onDisconnect}
+                aria-label="Disconnect wallet"
+                title="Disconnect wallet"
+                className="grid size-7 cursor-pointer place-items-center rounded-full text-ink-dim transition-colors hover:bg-white/10 hover:text-ink"
+              >
+                <LogOut size={13} />
+              </button>
             </motion.span>
           ) : (
             <motion.span variants={fadeRiseSm} className="inline-flex">

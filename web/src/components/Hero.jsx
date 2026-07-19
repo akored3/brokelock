@@ -39,7 +39,7 @@ export default function Hero({ onConnect }) {
           Brokelock is a vault on Monad that makes raiding your savings{' '}
           <strong className="font-semibold text-ink">cost you</strong>. Lock MON toward a
           goal. After the deadline, cash out free. Before it, the vault fines you on the
-          spot and wires the fine to the friend you chose back when you still had
+          spot and sets the fine aside for the friend you chose back when you still had
           discipline.
         </motion.p>
 

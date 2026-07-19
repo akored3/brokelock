@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { DayPicker } from 'react-day-picker';
 import { CalendarClock, ChevronLeft, ChevronRight, Clock } from 'lucide-react';
@@ -40,9 +40,12 @@ const dayPickerClassNames = {
   hidden: 'invisible',
 };
 
-export default function DateTimeField({ value, onChange, min }) {
+export default function DateTimeField({ value, onChange, min, error }) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef(null);
+  const triggerRef = useRef(null);
+  const dialogRef = useRef(null);
+  const errorId = useId();
 
   const selected = value ? new Date(value) : undefined;
   const minDate = min ? new Date(min) : undefined;
@@ -50,11 +53,15 @@ export default function DateTimeField({ value, onChange, min }) {
 
   useEffect(() => {
     if (!open) return;
+    dialogRef.current?.focus();
     const onDown = (e) => {
       if (!rootRef.current?.contains(e.target)) setOpen(false);
     };
     const onKey = (e) => {
-      if (e.key === 'Escape') setOpen(false);
+      if (e.key === 'Escape') {
+        setOpen(false);
+        triggerRef.current?.focus();
+      }
     };
     document.addEventListener('mousedown', onDown);
     document.addEventListener('keydown', onKey);
@@ -63,6 +70,10 @@ export default function DateTimeField({ value, onChange, min }) {
       document.removeEventListener('keydown', onKey);
     };
   }, [open]);
+
+  useEffect(() => {
+    if (error) triggerRef.current?.focus();
+  }, [error]);
 
   function commit(next) {
     if (minDate && next < minDate) next = new Date(minDate);
@@ -100,72 +111,78 @@ export default function DateTimeField({ value, onChange, min }) {
     <div ref={rootRef} className="relative">
       <button
         type="button"
+        ref={triggerRef}
         onClick={() => setOpen((o) => !o)}
         aria-haspopup="dialog"
         aria-expanded={open}
-        className="field flex cursor-pointer items-center justify-between gap-2 text-left font-mono text-sm"
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? errorId : undefined}
+        className={`field flex cursor-pointer items-center justify-between gap-2 text-left font-mono text-sm ${error ? 'border-danger/60' : ''}`}
       >
         <span className={selected ? 'text-ink' : 'text-ink-faint'}>{label}</span>
         <CalendarClock size={15} className="shrink-0 text-ink-faint" />
       </button>
-      {/* keeps native form validation: invisible but focusable mirror of the value */}
-      <input
-        required
-        tabIndex={-1}
-        aria-hidden="true"
-        value={value}
-        onChange={() => {}}
-        onFocus={() => setOpen(true)}
-        className="absolute bottom-0 left-4 h-px w-px opacity-0"
-      />
+      {error && (
+        <p id={errorId} role="alert" className="mt-1.5 text-xs text-danger">
+          {error}
+        </p>
+      )}
 
       <AnimatePresence>
         {open && (
           <motion.div
-            role="dialog"
             className="glass glass-strong absolute left-0 top-[calc(100%+8px)] z-50 w-[292px] rounded-2xl bg-raised/95 p-4"
             initial={{ opacity: 0, y: -6, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -6, scale: 0.98 }}
             transition={springSnappy}
           >
-            <div className="mb-3 flex flex-wrap gap-1.5">
-              {PRESETS.map(({ label: l, apply }) => (
-                <button
-                  key={l}
-                  type="button"
-                  onClick={() => pickPreset(apply)}
-                  className="cursor-pointer rounded-full border border-white/10 bg-white/5 px-2.5 py-1 font-mono text-[0.62rem] uppercase tracking-wide text-ink-dim transition-colors hover:border-iris/50 hover:bg-iris/20 hover:text-ink"
-                >
-                  +{l}
-                </button>
-              ))}
-            </div>
+            {/* plain div carries the ref: motion reads refs off AnimatePresence children, which React flags */}
+            <div
+              ref={dialogRef}
+              role="dialog"
+              aria-label="Pick a date and time"
+              tabIndex={-1}
+              className="outline-none"
+            >
+              <div className="mb-3 flex flex-wrap gap-1.5">
+                {PRESETS.map(({ label: l, apply }) => (
+                  <button
+                    key={l}
+                    type="button"
+                    onClick={() => pickPreset(apply)}
+                    className="cursor-pointer rounded-full border border-white/10 bg-white/5 px-2.5 py-1 font-mono text-[0.62rem] uppercase tracking-wide text-ink-dim transition-colors hover:border-iris/50 hover:bg-iris/20 hover:text-ink"
+                  >
+                    +{l}
+                  </button>
+                ))}
+              </div>
 
-            <DayPicker
-              mode="single"
-              selected={selected}
-              onSelect={pickDay}
-              month={month}
-              onMonthChange={setMonth}
-              disabled={minDate ? { before: minDate } : undefined}
-              showOutsideDays
-              classNames={dayPickerClassNames}
-              components={{
-                Chevron: ({ orientation }) =>
-                  orientation === 'left' ? <ChevronLeft size={16} /> : <ChevronRight size={16} />,
-              }}
-            />
-
-            <div className="mt-3 flex items-center gap-2.5 border-t border-white/[0.07] pt-3">
-              <Clock size={14} className="shrink-0 text-ink-faint" />
-              <input
-                type="time"
-                aria-label="Time"
-                className="field flex-1 py-2 font-mono text-sm"
-                value={selected ? `${pad(selected.getHours())}:${pad(selected.getMinutes())}` : ''}
-                onChange={(e) => pickTime(e.target.value)}
+              <DayPicker
+                mode="single"
+                selected={selected}
+                onSelect={pickDay}
+                month={month}
+                onMonthChange={setMonth}
+                disabled={minDate ? { before: minDate } : undefined}
+                showOutsideDays
+                classNames={dayPickerClassNames}
+                components={{
+                  Chevron: ({ orientation }) =>
+                    orientation === 'left' ? <ChevronLeft size={16} /> : <ChevronRight size={16} />,
+                }}
               />
+
+              <div className="mt-3 flex items-center gap-2.5 border-t border-white/[0.07] pt-3">
+                <Clock size={14} className="shrink-0 text-ink-faint" />
+                <input
+                  type="time"
+                  aria-label="Time"
+                  className="field flex-1 py-2 font-mono text-sm"
+                  value={selected ? `${pad(selected.getHours())}:${pad(selected.getMinutes())}` : ''}
+                  onChange={(e) => pickTime(e.target.value)}
+                />
+              </div>
             </div>
           </motion.div>
         )}

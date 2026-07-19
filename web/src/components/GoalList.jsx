@@ -61,7 +61,7 @@ export default function GoalList({ goals, now, busy, send }) {
       </section>
       {settled.length > 0 && (
         <section>
-          <h4 className="mb-2.5 font-mono text-[0.62rem] uppercase tracking-[0.2em] text-ink-faint">
+          <h4 className="mb-2.5 font-mono text-[0.68rem] uppercase tracking-[0.2em] text-ink-faint">
             Settled
           </h4>
           <div className="grid gap-2">
@@ -74,8 +74,9 @@ export default function GoalList({ goals, now, busy, send }) {
                   <Check size={13} className="shrink-0 text-success" />
                   {g.name}
                 </span>
+                {/* onchain data can't tell a full withdrawal from a lapsed empty goal, so just "closed" */}
                 <span className="font-mono text-xs text-ink-faint">
-                  penalty {g.penaltyBps / 100}% · paid out
+                  penalty {g.penaltyBps / 100}% · closed
                 </span>
               </div>
             ))}

@@ -16,6 +16,7 @@ const Label = ({ children }) => (
 export default function CreateGoal({ busy, send, now }) {
   const [name, setName] = useState('');
   const [deadline, setDeadline] = useState('');
+  const [deadlineError, setDeadlineError] = useState('');
   const [penalty, setPenalty] = useState(10);
   const [partner, setPartner] = useState('');
 
@@ -27,7 +28,17 @@ export default function CreateGoal({ busy, send, now }) {
 
   async function submit(e) {
     e.preventDefault();
-    const ts = Math.floor(new Date(deadline).getTime() / 1000);
+    // the picker clamps at pick time; re-check here in case the form sat open
+    const ts = deadline ? Math.floor(new Date(deadline).getTime() / 1000) : NaN;
+    if (Number.isNaN(ts)) {
+      setDeadlineError('Pick a deadline.');
+      return;
+    }
+    if (ts < Math.floor(Date.now() / 1000) + 300) {
+      setDeadlineError('Deadline must be at least 5 minutes from now.');
+      return;
+    }
+    setDeadlineError('');
     const ok = await send(
       'create',
       'createGoal',
@@ -71,7 +82,15 @@ export default function CreateGoal({ busy, send, now }) {
 
         <div className="flex flex-col gap-2">
           <Label>Locked until</Label>
-          <DateTimeField value={deadline} onChange={setDeadline} min={minLocal} />
+          <DateTimeField
+            value={deadline}
+            onChange={(v) => {
+              setDeadline(v);
+              setDeadlineError('');
+            }}
+            min={minLocal}
+            error={deadlineError}
+          />
         </div>
 
         <label className="flex flex-col gap-2.5">

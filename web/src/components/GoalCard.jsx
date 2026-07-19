@@ -29,8 +29,21 @@ export default function GoalCard({ goal, goalId, now, busy, send }) {
 
   async function depositNow(e) {
     e.preventDefault();
+    let value = 0n;
+    try {
+      value = parseEther(amount);
+    } catch {
+      // parseEther rejects what type="number" allows (e.g. "1e2")
+    }
+    if (value <= 0n) {
+      const input = e.currentTarget.querySelector('input');
+      input.setCustomValidity('Enter a plain decimal amount above zero, like 0.05');
+      input.reportValidity();
+      input.setCustomValidity('');
+      return;
+    }
     const ok = await send(
-      `deposit-${goalId}`, 'deposit', [BigInt(goalId)], parseEther(amount),
+      `deposit-${goalId}`, 'deposit', [BigInt(goalId)], value,
       'Deposited. The vault holds it now, not you.',
     );
     if (ok) setAmount('');

@@ -22,7 +22,7 @@ export default function VaultBar({ totalLocked, claimable, burned }) {
         <div key={id} className="flex min-w-0 items-center gap-3 px-5 py-3">
           <Icon size={15} className={`shrink-0 ${iconCls}`} />
           <div className="min-w-0">
-            <div className="font-mono text-[0.58rem] uppercase tracking-[0.16em] text-ink-faint">
+            <div className="font-mono text-[0.68rem] uppercase tracking-[0.16em] text-ink-faint">
               {label}
             </div>
             <motion.div

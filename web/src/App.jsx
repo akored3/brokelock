@@ -1,18 +1,16 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { motion, AnimatePresence, MotionConfig } from 'motion/react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { createPublicClient, createWalletClient, custom, http } from 'viem';
 import { BROKELOCK_ADDRESS, BROKELOCK_ABI, EXPLORER, monadTestnet } from './contract.js';
 import Backdrop from './components/Backdrop.jsx';
 import Topbar from './components/Topbar.jsx';
 import Landing from './components/Landing.jsx';
-import VaultBar from './components/VaultBar.jsx';
-import CreateGoal from './components/CreateGoal.jsx';
-import GoalList from './components/GoalList.jsx';
-import ClaimPanel from './components/ClaimPanel.jsx';
-import Colophon from './components/Colophon.jsx';
 import Notice from './components/Notice.jsx';
 import { EASE_OUT_EXPO as EASE } from './lib/motion.js';
 import { DEMO, DEMO_ACCOUNT, DEMO_GOALS, DEMO_CLAIMABLE, DEMO_BURNED } from './lib/demo.js';
+
+// visitors only pay for the goal UI (and react-day-picker) once they connect
+const AppView = lazy(() => import('./components/AppView.jsx'));
 
 const pub = createPublicClient({ chain: monadTestnet, transport: http() });
 
@@ -25,11 +23,15 @@ export default function App() {
   const [notice, setNotice] = useState(null);
   const [now, setNow] = useState(Math.floor(Date.now() / 1000));
   const walletRef = useRef(null);
+  const noticeTimer = useRef(null);
 
+  // only the connected view reads `now`; don't re-render the landing every second
   useEffect(() => {
+    if (!account) return;
+    setNow(Math.floor(Date.now() / 1000));
     const t = setInterval(() => setNow(Math.floor(Date.now() / 1000)), 1000);
     return () => clearInterval(t);
-  }, []);
+  }, [account]);
 
   useEffect(() => {
     if (DEMO) return;
@@ -39,8 +41,9 @@ export default function App() {
   }, []);
 
   const say = (kind, text) => {
+    clearTimeout(noticeTimer.current);
     setNotice({ kind, text });
-    if (kind !== 'error') setTimeout(() => setNotice(null), 7000);
+    if (kind !== 'error') noticeTimer.current = setTimeout(() => setNotice(null), 7000);
   };
 
   const refresh = useCallback(async (addr) => {
@@ -64,7 +67,22 @@ export default function App() {
 
   async function connect() {
     if (!window.ethereum) {
-      say('error', 'No wallet found. Install MetaMask, then come back and face your finances.');
+      const mobile = /iphone|ipad|ipod|android/i.test(navigator.userAgent);
+      say('error', mobile ? (
+        <>
+          No wallet in this browser.{' '}
+          <a href={`https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`}>
+            Open Brokelock in MetaMask
+          </a>{' '}
+          and face your finances there.
+        </>
+      ) : (
+        <>
+          No wallet found.{' '}
+          <a href="https://metamask.io/download" target="_blank" rel="noreferrer">Install MetaMask</a>,
+          then come back and face your finances.
+        </>
+      ));
       return;
     }
     try {
@@ -95,6 +113,49 @@ export default function App() {
       say('error', err.shortMessage ?? err.message ?? 'Wallet connection failed.');
     }
   }
+
+  function disconnect() {
+    walletRef.current = null;
+    setAccount(null);
+    setGoals(null);
+    setClaimable(0n);
+    setNotice(null);
+    // MetaMask keeps the site authorized otherwise; revoke so reconnect prompts again
+    window.ethereum
+      ?.request({ method: 'wallet_revokePermissions', params: [{ eth_accounts: {} }] })
+      .catch(() => {});
+  }
+
+  useEffect(() => {
+    const eth = window.ethereum;
+    if (DEMO || !eth?.on) return;
+    const onAccounts = (accounts) => {
+      if (!walletRef.current) return;
+      if (accounts.length === 0) {
+        walletRef.current = null;
+        setAccount(null);
+        setGoals(null);
+        setClaimable(0n);
+        say('ok', 'Wallet disconnected.');
+      } else {
+        setGoals(null);
+        setClaimable(0n);
+        setAccount(accounts[0]);
+      }
+    };
+    const onChain = (chainId) => {
+      if (!walletRef.current) return;
+      if (chainId?.toLowerCase() !== '0x' + monadTestnet.id.toString(16)) {
+        say('error', 'Wrong network. Switch back to Monad Testnet or transactions will fail.');
+      }
+    };
+    eth.on('accountsChanged', onAccounts);
+    eth.on('chainChanged', onChain);
+    return () => {
+      eth.removeListener('accountsChanged', onAccounts);
+      eth.removeListener('chainChanged', onChain);
+    };
+  }, []);
 
   async function send(label, functionName, args, value, okText) {
     if (DEMO) {
@@ -137,9 +198,9 @@ export default function App() {
   );
 
   return (
-    <MotionConfig reducedMotion="user">
+    <>
       <Backdrop density={account ? 20 : 32} />
-      <Topbar account={account} onConnect={connect} />
+      <Topbar account={account} onConnect={connect} onDisconnect={disconnect} />
       <Notice notice={notice} onDismiss={() => setNotice(null)} />
       <div className="relative z-[2] mx-auto max-w-[1100px] px-6 pb-20">
         <AnimatePresence mode="wait">
@@ -160,30 +221,23 @@ export default function App() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: EASE }}
             >
-              <VaultBar totalLocked={totalLocked} claimable={claimable} burned={burned} />
-              <main className="mt-6 grid items-start gap-5 lg:grid-cols-[380px_1fr]">
-                <aside className="lg:sticky lg:top-[140px]">
-                  <CreateGoal busy={busy} send={send} now={now} />
-                </aside>
-                <div className="grid min-w-0 gap-5">
-                  <AnimatePresence>
-                    {claimable > 0n && (
-                      <ClaimPanel
-                        claimable={claimable}
-                        busy={busy}
-                        onClaim={() => send('claim', 'claim', [], undefined, 'Penalties claimed. Enjoy their weakness.')}
-                      />
-                    )}
-                  </AnimatePresence>
-                  <GoalList goals={goals} now={now} busy={busy} send={send} />
-                  <Colophon burned={burned} />
-                </div>
-              </main>
+              <Suspense fallback={null}>
+                <AppView
+                  totalLocked={totalLocked}
+                  claimable={claimable}
+                  burned={burned}
+                  goals={goals}
+                  now={now}
+                  busy={busy}
+                  send={send}
+                  onClaim={() => send('claim', 'claim', [], undefined, 'Penalties claimed. Enjoy their weakness.')}
+                />
+              </Suspense>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
-    </MotionConfig>
+    </>
   );
 }
 
