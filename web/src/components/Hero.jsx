@@ -26,7 +26,7 @@ export default function Hero({ onConnect }) {
           variants={fadeRise}
           className="font-display text-[clamp(2.5rem,5.2vw,4rem)] font-semibold leading-[1.05] tracking-tight text-ink"
         >
-          Your savings app&rsquo;s withdraw button works just fine at 2am.{' '}
+          Your savings app&rsquo;s withdraw button works fine at 2am.{' '}
           <em className="block not-italic bg-linear-to-r from-iris-bright to-lilac bg-clip-text text-transparent">
             That&rsquo;s the problem.
           </em>

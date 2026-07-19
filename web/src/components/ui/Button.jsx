@@ -5,7 +5,7 @@ const base =
 
 const variants = {
   primary:
-    'bg-linear-to-b from-iris to-iris-deep text-white shadow-[0_10px_28px_-8px_rgba(110,84,255,0.7),inset_0_1px_0_rgba(255,255,255,0.25)] hover:from-iris-bright hover:to-iris',
+    'bg-linear-to-b from-iris to-iris-deep text-white shadow-[0_10px_28px_-8px_rgba(110,84,255,0.7),inset_0_1px_0_rgba(255,255,255,0.25)] hover:to-iris',
   ghost: 'glass text-ink hover:border-white/25',
   quiet: 'border border-white/10 bg-white/5 text-ink-dim hover:bg-white/10 hover:text-ink',
   danger: 'border border-danger/40 bg-danger/15 text-danger hover:bg-danger/25',

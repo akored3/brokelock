@@ -82,18 +82,8 @@ export default function VaultDial() {
         animate={{ rotate: 290 }}
         transition={{ rotate: { duration: 110, repeat: Infinity, ease: 'linear' } }}
       >
-        {/* metallic gradient ring */}
-        <div
-          className="absolute inset-0 rounded-full border-[6px] border-transparent shadow-[0_0_28px_rgba(110,84,255,0.5),inset_0_0_18px_rgba(110,84,255,0.3)]"
-          style={{
-            background:
-              'conic-gradient(from 140deg, #8f7bff, #5138e6 22%, #c3b6ff 38%, #6e54ff 55%, #4a35c4 72%, #a292ff 88%, #8f7bff) border-box',
-            mask: 'linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0)',
-            WebkitMask: 'linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0)',
-            maskComposite: 'exclude',
-            WebkitMaskComposite: 'xor',
-          }}
-        />
+        {/* metallic gradient ring (solid border fallback lives in .wheel-ring) */}
+        <div className="wheel-ring" />
         {[0, 60, 120].map((deg) => (
           <div key={deg} className="absolute inset-0" style={{ transform: `rotate(${deg}deg)` }}>
             <div className="absolute left-1/2 top-0 h-full w-[6px] -translate-x-1/2 rounded-full bg-linear-to-b from-iris via-iris-bright to-iris shadow-[inset_1px_0_1px_rgba(255,255,255,0.35),inset_-1px_0_2px_rgba(4,2,12,0.4)]" />

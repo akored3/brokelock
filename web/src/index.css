@@ -142,6 +142,43 @@
     box-shadow: 0 0 0 3px rgba(110, 84, 255, 0.25);
   }
 
+  /* vault wheel ring: metallic conic gradient where the two-layer mask trick
+     is supported, solid iris border where it isn't (old Safari renders the
+     unmasked conic as a filled disc) */
+  .wheel-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 6px solid rgba(110, 84, 255, 0.8);
+    box-shadow:
+      0 0 28px rgba(110, 84, 255, 0.5),
+      inset 0 0 18px rgba(110, 84, 255, 0.3);
+  }
+  @supports (mask-composite: exclude) or (-webkit-mask-composite: xor) {
+    .wheel-ring {
+      border-color: transparent;
+      background: conic-gradient(
+          from 140deg,
+          #8f7bff,
+          #5138e6 22%,
+          #c3b6ff 38%,
+          #6e54ff 55%,
+          #4a35c4 72%,
+          #a292ff 88%,
+          #8f7bff
+        )
+        border-box;
+      -webkit-mask:
+        linear-gradient(#000 0 0) padding-box,
+        linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask:
+        linear-gradient(#000 0 0) padding-box,
+        linear-gradient(#000 0 0);
+      mask-composite: exclude;
+    }
+  }
+
   .spinner-ui {
     display: inline-block;
     width: 14px;

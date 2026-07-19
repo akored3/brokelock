@@ -4,7 +4,7 @@ import { fadeRise, staggerParent, viewportOnce } from '../lib/motion.js';
 
 const STEPS = [
   {
-    img: '/steps/commit.png',
+    img: '/steps/commit.webp',
     Icon: FileSignature,
     title: 'Commit',
     body: (
@@ -15,7 +15,7 @@ const STEPS = [
     ),
   },
   {
-    img: '/steps/stack.png',
+    img: '/steps/stack.webp',
     Icon: Coins,
     title: 'Stack',
     body: (
@@ -26,7 +26,7 @@ const STEPS = [
     ),
   },
   {
-    img: '/steps/hold.png',
+    img: '/steps/hold.webp',
     Icon: ShieldCheck,
     title: 'Hold the line',
     body: (
