@@ -22,6 +22,7 @@ export default function App() {
   const [busy, setBusy] = useState(null);
   const [notice, setNotice] = useState(null);
   const [now, setNow] = useState(Math.floor(Date.now() / 1000));
+  const [deleted, setDeleted] = useState(() => new Set());
   const walletRef = useRef(null);
   const noticeTimer = useRef(null);
 
@@ -39,6 +40,43 @@ export default function App() {
       .then(setBurned)
       .catch(() => {});
   }, []);
+
+  // the contract keeps every goal forever (a withdraw only zeroes the
+  // balance), so "deleting" a commitment means remembering its id per wallet
+  // and hiding it. Rage-quits auto-delete; dead 0-balance cards go by hand.
+  useEffect(() => {
+    if (DEMO || !account) {
+      setDeleted(new Set());
+      return;
+    }
+    try {
+      const raw = localStorage.getItem(`brokelock:deleted:${account.toLowerCase()}`);
+      setDeleted(new Set(raw ? JSON.parse(raw) : []));
+    } catch {
+      setDeleted(new Set());
+    }
+  }, [account]);
+
+  const deleteGoal = useCallback(
+    (goalId) => {
+      setDeleted((prev) => {
+        const next = new Set(prev);
+        next.add(goalId);
+        if (!DEMO && account) {
+          try {
+            localStorage.setItem(
+              `brokelock:deleted:${account.toLowerCase()}`,
+              JSON.stringify([...next]),
+            );
+          } catch {
+            // storage full or blocked; the card just reappears next session
+          }
+        }
+        return next;
+      });
+    },
+    [account],
+  );
 
   const say = (kind, text) => {
     clearTimeout(noticeTimer.current);
@@ -158,7 +196,15 @@ export default function App() {
   }, []);
 
   async function send(label, functionName, args, value, okText) {
+    // an early withdraw leaves a dead 0-balance goal onchain; hide its card
+    const deleteIfRageQuit = () => {
+      if (functionName !== 'withdraw') return;
+      const goalId = Number(args[0]);
+      const g = goals?.[goalId];
+      if (g && Math.floor(Date.now() / 1000) < Number(g.deadline)) deleteGoal(goalId);
+    };
     if (DEMO) {
+      deleteIfRageQuit();
       say('ok', 'Demo mode: nothing goes onchain.');
       return true;
     }
@@ -176,6 +222,7 @@ export default function App() {
       const hash = await walletRef.current.writeContract(request);
       const receipt = await pub.waitForTransactionReceipt({ hash });
       if (receipt.status !== 'success') throw new Error('Transaction reverted.');
+      deleteIfRageQuit();
       await refresh(account);
       say('ok', (
         <>
@@ -230,6 +277,11 @@ export default function App() {
                   now={now}
                   busy={busy}
                   send={send}
+                  deleted={deleted}
+                  onDelete={(goalId) => {
+                    deleteGoal(goalId);
+                    say('ok', 'Deleted. The chain remembers it; this page won’t.');
+                  }}
                   onClaim={() => send('claim', 'claim', [], undefined, 'Penalties claimed. Enjoy their weakness.')}
                 />
               </Suspense>

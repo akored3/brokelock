@@ -11,7 +11,7 @@ function Skeleton() {
   );
 }
 
-export default function GoalList({ goals, now, busy, send }) {
+export default function GoalList({ goals, now, busy, send, deleted, onDelete }) {
   if (goals === null) {
     return (
       <div className="grid gap-5 xl:grid-cols-2">
@@ -24,13 +24,14 @@ export default function GoalList({ goals, now, busy, send }) {
   const active = [];
   const settled = [];
   goals.forEach((g, i) => {
+    if (deleted.has(i)) return; // rage-quit or hand-deleted; hidden for good
     const early = now < Number(g.deadline);
     (g.balance > 0n || early ? active : settled).push([g, i]);
   });
   // most urgent first: passed deadlines (free to withdraw), then soonest upcoming
   active.sort(([a], [b]) => Number(a.deadline) - Number(b.deadline));
 
-  if (goals.length === 0) {
+  if (active.length === 0 && settled.length === 0) {
     return (
       <motion.section
         className="glass flex flex-col items-center gap-3 p-10 text-center"
@@ -55,7 +56,7 @@ export default function GoalList({ goals, now, busy, send }) {
       <section className="grid items-start gap-5 xl:grid-cols-2">
         <AnimatePresence initial={false}>
           {active.map(([g, i]) => (
-            <GoalCard key={i} goal={g} goalId={i} now={now} busy={busy} send={send} />
+            <GoalCard key={i} goal={g} goalId={i} now={now} busy={busy} send={send} onDelete={onDelete} />
           ))}
         </AnimatePresence>
       </section>

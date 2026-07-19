@@ -7,7 +7,7 @@ import Colophon from './Colophon.jsx';
 
 // Lazy-loaded connected view: keeps react-day-picker and the goal UI out of
 // the landing-page bundle (see App.jsx).
-export default function AppView({ totalLocked, claimable, burned, goals, now, busy, send, onClaim }) {
+export default function AppView({ totalLocked, claimable, burned, goals, now, busy, send, deleted, onDelete, onClaim }) {
   return (
     <>
       <VaultBar totalLocked={totalLocked} claimable={claimable} burned={burned} />
@@ -21,7 +21,7 @@ export default function AppView({ totalLocked, claimable, burned, goals, now, bu
               <ClaimPanel claimable={claimable} busy={busy} onClaim={onClaim} />
             )}
           </AnimatePresence>
-          <GoalList goals={goals} now={now} busy={busy} send={send} />
+          <GoalList goals={goals} now={now} busy={busy} send={send} deleted={deleted} onDelete={onDelete} />
           <Colophon burned={burned} />
         </div>
       </main>

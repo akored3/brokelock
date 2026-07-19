@@ -9,6 +9,7 @@ import {
   Flame,
   UserRound,
   Plus,
+  Trash2,
   TriangleAlert,
 } from 'lucide-react';
 import { fmt, short, countdown, ZERO } from '../lib/format.js';
@@ -16,7 +17,7 @@ import { EASE_OUT_EXPO } from '../lib/motion.js';
 import Button from './ui/Button.jsx';
 import Spinner from './ui/Spinner.jsx';
 
-export default function GoalCard({ goal, goalId, now, busy, send }) {
+export default function GoalCard({ goal, goalId, now, busy, send, onDelete }) {
   const [amount, setAmount] = useState('');
   const [armed, setArmed] = useState(false);
 
@@ -161,6 +162,17 @@ export default function GoalCard({ goal, goalId, now, busy, send }) {
             )}
           </Button>
         </form>
+
+        {goal.balance === 0n && (
+          <Button
+            variant="quiet"
+            disabled={busy !== null}
+            onClick={() => onDelete(goalId)}
+            aria-label={`Delete ${goal.name}`}
+          >
+            <Trash2 size={14} /> Delete
+          </Button>
+        )}
 
         {goal.balance > 0n && (
           <div className="flex min-w-0 flex-col items-end gap-3">

@@ -54,7 +54,11 @@ pre-created with a deadline ~2 minutes out so the "unlock" happens on camera.
 > every number you saw was Monad state. Brokelock: savings with
 > consequences. Built solo during Spark."
 
-## Social post draft (X/Twitter)
+## Social post (X/Twitter)
+
+**Posted:** https://x.com/yeahbrizzy/status/2078957198730731926 — use this URL in the submission form.
+
+### Draft (as posted)
 
 ---
 
