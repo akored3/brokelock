@@ -15,6 +15,7 @@ import {
 import { fmt, short, countdown, ZERO } from '../lib/format.js';
 import { EASE_OUT_EXPO } from '../lib/motion.js';
 import Button from './ui/Button.jsx';
+import IconButton from './ui/IconButton.jsx';
 import Spinner from './ui/Spinner.jsx';
 
 export default function GoalCard({ goal, goalId, now, busy, send, onDelete }) {
@@ -164,14 +165,14 @@ export default function GoalCard({ goal, goalId, now, busy, send, onDelete }) {
         </form>
 
         {goal.balance === 0n && (
-          <Button
-            variant="quiet"
+          <IconButton
+            className="self-center"
             disabled={busy !== null}
             onClick={() => onDelete(goalId)}
             aria-label={`Delete ${goal.name}`}
           >
-            <Trash2 size={14} /> Delete
-          </Button>
+            <Trash2 size={14} />
+          </IconButton>
         )}
 
         {goal.balance > 0n && (

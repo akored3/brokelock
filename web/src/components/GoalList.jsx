@@ -1,7 +1,8 @@
 import { motion, AnimatePresence } from 'motion/react';
-import { Vault, Check } from 'lucide-react';
+import { Vault, Check, Trash2 } from 'lucide-react';
 import { EASE_OUT_EXPO } from '../lib/motion.js';
 import GoalCard from './GoalCard.jsx';
+import IconButton from './ui/IconButton.jsx';
 
 function Skeleton() {
   return (
@@ -75,9 +76,18 @@ export default function GoalList({ goals, now, busy, send, deleted, onDelete }) 
                   <Check size={13} className="shrink-0 text-success" />
                   {g.name}
                 </span>
-                {/* onchain data can't tell a full withdrawal from a lapsed empty goal, so just "closed" */}
-                <span className="font-mono text-xs text-ink-faint">
-                  penalty {g.penaltyBps / 100}% · closed
+                <span className="inline-flex items-center gap-1.5">
+                  {/* onchain data can't tell a full withdrawal from a lapsed empty goal, so just "closed" */}
+                  <span className="font-mono text-xs text-ink-faint">
+                    penalty {g.penaltyBps / 100}% · closed
+                  </span>
+                  <IconButton
+                    disabled={busy !== null}
+                    onClick={() => onDelete(i)}
+                    aria-label={`Delete ${g.name}`}
+                  >
+                    <Trash2 size={14} />
+                  </IconButton>
                 </span>
               </div>
             ))}
