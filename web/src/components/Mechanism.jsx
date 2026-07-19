@@ -9,8 +9,8 @@ const STEPS = [
     title: 'Commit',
     body: (
       <>
-        Name a goal, set a deadline, pick your penalty &mdash; up to 50% &mdash; and the
-        friend who profits if you fold. Signed onchain, no take-backs.
+        Name a goal, set a deadline, pick a penalty of up to 50%, and choose the
+        friend who profits if you fold. Sealed onchain, no take-backs.
       </>
     ),
   },
@@ -31,8 +31,8 @@ const STEPS = [
     title: 'Hold the line',
     body: (
       <>
-        After the deadline it&rsquo;s all yours, free. Before it, quitting has a price tag
-        &mdash; computed by the contract and shown in full before you pay it.
+        After the deadline it&rsquo;s all yours, free. Before it, quitting has a price
+        tag: the contract does the math and shows you the damage before you pay.
       </>
     ),
   },

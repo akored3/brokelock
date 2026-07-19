@@ -12,17 +12,17 @@ function Run({ burned }) {
         {fmt(burned, 4)} MON burned by the undisciplined
       </span>
       <Sep />
-      <span>every number on this page is live chain state</span>
+      <span>no backend, no database, the contract is the app</span>
       <Sep />
       <span>contract {short(BROKELOCK_ADDRESS)} · verified</span>
       <Sep />
-      <span>penalties up to 50% · your friend collects</span>
+      <span>penalties up to 50% · your weakness pays your friend</span>
       <Sep />
     </span>
   );
 }
 
-// Infinite hazard marquee — two identical runs, shifted -50% for a seamless loop.
+// Infinite hazard marquee: two identical runs, shifted -50% for a seamless loop.
 export default function Ticker({ burned }) {
   return (
     <div className="glass rounded-2xl" aria-hidden="true">

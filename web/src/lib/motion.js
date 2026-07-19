@@ -1,4 +1,4 @@
-// Shared motion vocabulary — every section imports from here.
+// Shared motion vocabulary: every section imports from here.
 // No inline easing arrays or one-off variant objects in components.
 
 export const EASE_OUT_EXPO = [0.19, 1, 0.22, 1];

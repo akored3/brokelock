@@ -23,7 +23,7 @@
 }
 
 :root {
-  /* liquid-glass knobs — variant classes override these */
+  /* liquid-glass knobs; variant classes override these */
   --glass-bg: rgba(255, 255, 255, 0.045);
   --glass-border: rgba(255, 255, 255, 0.09);
   --glass-blur: 20px;

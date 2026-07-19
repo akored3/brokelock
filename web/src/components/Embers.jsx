@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-// Ambient ember field — iris sparks drifting up. Money burning, slowly.
+// Ambient ember field: iris sparks drifting up. Money burning, slowly.
 export default function Embers({ density = 30 }) {
   const ref = useRef(null);
 

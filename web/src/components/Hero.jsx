@@ -26,7 +26,7 @@ export default function Hero({ onConnect }) {
           variants={fadeRise}
           className="font-display text-[clamp(2.5rem,5.2vw,4rem)] font-semibold leading-[1.05] tracking-tight text-ink"
         >
-          Your savings app&rsquo;s withdraw button works at 2am.{' '}
+          Your savings app&rsquo;s withdraw button works just fine at 2am.{' '}
           <em className="block not-italic bg-linear-to-r from-iris-bright to-lilac bg-clip-text text-transparent">
             That&rsquo;s the problem.
           </em>
@@ -36,10 +36,10 @@ export default function Hero({ onConnect }) {
           variants={fadeRise}
           className="max-w-[54ch] text-[1.05rem] leading-relaxed text-ink-dim"
         >
-          Brokelock is a vault on Monad that makes touching your savings{' '}
+          Brokelock is a vault on Monad that makes raiding your savings{' '}
           <strong className="font-semibold text-ink">cost you</strong>. Lock MON toward a
-          goal. Cash out after the deadline, free. Cash out early and the vault fines you
-          on the spot &mdash; and wires the fine to a friend you chose while you still had
+          goal. After the deadline, cash out free. Before it, the vault fines you on the
+          spot and wires the fine to the friend you chose back when you still had
           discipline.
         </motion.p>
 

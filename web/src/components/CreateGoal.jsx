@@ -101,7 +101,7 @@ export default function CreateGoal({ busy, send, now }) {
         <label className="flex flex-col gap-2">
           <Label>Accountability partner</Label>
           <span className="text-xs text-ink-faint">
-            They pocket your penalty. Leave empty to burn it.
+            They pocket your penalty if you fold. Leave empty to burn it.
           </span>
           <span className="relative">
             <UserRoundPlus

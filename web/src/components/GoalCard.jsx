@@ -178,7 +178,7 @@ export default function GoalCard({ goal, goalId, now, busy, send }) {
               ) : early ? (
                 armed ? 'Yes, fine me' : 'Rage-quit early'
               ) : (
-                'Withdraw — no penalty'
+                'Withdraw penalty-free'
               )}
             </Button>
           </div>

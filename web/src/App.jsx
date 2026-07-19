@@ -98,7 +98,7 @@ export default function App() {
 
   async function send(label, functionName, args, value, okText) {
     if (DEMO) {
-      say('ok', 'Demo mode — nothing goes onchain.');
+      say('ok', 'Demo mode: nothing goes onchain.');
       return true;
     }
     setBusy(label);
