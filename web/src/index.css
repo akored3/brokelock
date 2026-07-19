@@ -172,9 +172,18 @@
   overflow: hidden;
   pointer-events: none;
   background:
-    radial-gradient(1200px 640px at 78% -12%, rgba(110, 84, 255, 0.17), transparent 62%),
-    radial-gradient(900px 520px at 12% 108%, rgba(110, 84, 255, 0.08), transparent 60%),
-    linear-gradient(180deg, var(--color-abyss) 0%, var(--color-void) 46%);
+    radial-gradient(1300px 700px at 78% -12%, rgba(110, 84, 255, 0.2), transparent 60%),
+    radial-gradient(1000px 580px at 12% 108%, rgba(81, 56, 230, 0.11), transparent 60%),
+    radial-gradient(800px 520px at 45% 42%, rgba(110, 84, 255, 0.05), transparent 70%),
+    linear-gradient(180deg, #100a20 0%, var(--color-abyss) 34%, var(--color-void) 72%);
+}
+
+/* corner vignette: pulls focus inward, hides gradient banding at the edges */
+.backdrop::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(125% 95% at 50% 24%, transparent 58%, rgba(2, 1, 6, 0.5) 100%);
 }
 
 .backdrop-orb {
