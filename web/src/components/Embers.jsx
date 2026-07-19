@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-// Ambient ember field — tiny amber sparks drifting up. Money burning, slowly.
+// Ambient ember field — iris sparks drifting up. Money burning, slowly.
 export default function Embers({ density = 30 }) {
   const ref = useRef(null);
 
@@ -8,6 +8,13 @@ export default function Embers({ density = 30 }) {
     const canvas = ref.current;
     const ctx = canvas.getContext('2d');
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const hex = getComputedStyle(document.documentElement)
+      .getPropertyValue('--color-iris-bright')
+      .trim();
+    const rgb = /^#[0-9a-f]{6}$/i.test(hex)
+      ? [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(', ')
+      : '155, 135, 255';
 
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     let W, H, raf;
@@ -46,7 +53,7 @@ export default function Embers({ density = 30 }) {
         const alpha = p.a * (0.55 + 0.45 * Math.sin(t * 1.8 + p.tw));
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, 7);
-        ctx.fillStyle = `rgba(190, 172, 255, ${Math.max(alpha, 0)})`;
+        ctx.fillStyle = `rgba(${rgb}, ${Math.max(alpha, 0)})`;
         ctx.fill();
       }
     };
@@ -59,5 +66,5 @@ export default function Embers({ density = 30 }) {
     };
   }, [density]);
 
-  return <canvas ref={ref} className="embers" aria-hidden="true" />;
+  return <canvas ref={ref} className="ember-field" aria-hidden="true" />;
 }

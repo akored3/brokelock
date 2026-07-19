@@ -1,0 +1,244 @@
+@import "tailwindcss";
+
+@theme {
+  /* black / purple / white system */
+  --color-void: #06040b;
+  --color-abyss: #0d0818;
+  --color-raised: #150e26;
+  --color-iris: #6e54ff;
+  --color-iris-deep: #5138e6;
+  --color-iris-bright: #9b87ff;
+  --color-lilac: #ddd7fe;
+  --color-ink: #f6f4ff;
+  --color-ink-dim: #a89fd0;
+  --color-ink-faint: #7d75a8;
+  --color-success: #85e6ff;
+  --color-danger: #ff5a61;
+
+  --font-display: 'Clash Display', system-ui, sans-serif;
+  --font-sans: 'Satoshi', system-ui, -apple-system, sans-serif;
+  --font-mono: 'Roboto Mono', ui-monospace, monospace;
+
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+:root {
+  /* liquid-glass knobs — variant classes override these */
+  --glass-bg: rgba(255, 255, 255, 0.045);
+  --glass-border: rgba(255, 255, 255, 0.09);
+  --glass-blur: 20px;
+  --glass-radius: 20px;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    scroll-behavior: smooth;
+  }
+  body {
+    background-color: var(--color-void);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.55;
+    min-height: 100vh;
+    overflow-x: clip;
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--color-iris) 45%, transparent);
+    color: var(--color-ink);
+  }
+}
+
+@layer components {
+  /* liquid glass: translucent fill + backdrop refraction + specular top edge */
+  .glass {
+    position: relative;
+    border-radius: var(--glass-radius);
+    border: 1px solid var(--glass-border);
+    background:
+      linear-gradient(
+        150deg,
+        rgba(255, 255, 255, 0.08),
+        rgba(255, 255, 255, 0.02) 40%,
+        rgba(110, 84, 255, 0.06)
+      ),
+      var(--glass-bg);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.5);
+    backdrop-filter: blur(var(--glass-blur)) saturate(1.5);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.09),
+      inset 0 -1px 0 rgba(4, 2, 12, 0.35),
+      0 24px 60px -18px rgba(4, 2, 12, 0.65),
+      0 0 80px -30px rgba(110, 84, 255, 0.35);
+  }
+  .glass-strong {
+    --glass-bg: rgba(255, 255, 255, 0.065);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --glass-blur: 26px;
+  }
+  .glass-tinted {
+    --glass-bg: rgba(110, 84, 255, 0.1);
+    --glass-border: rgba(155, 135, 255, 0.22);
+  }
+
+  /* form fields */
+  .field {
+    width: 100%;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(4, 2, 12, 0.5);
+    padding: 10px 14px;
+    color: var(--color-ink);
+    font-size: 0.9rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .field::placeholder {
+    color: var(--color-ink-faint);
+  }
+  .field:focus {
+    outline: none;
+    border-color: var(--color-iris);
+    box-shadow: 0 0 0 3px rgba(110, 84, 255, 0.25);
+  }
+  .field::-webkit-calendar-picker-indicator {
+    filter: invert(0.8);
+    cursor: pointer;
+  }
+
+  .slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 999px;
+    background: linear-gradient(
+      90deg,
+      var(--color-iris) var(--fill, 20%),
+      rgba(255, 255, 255, 0.1) var(--fill, 20%)
+    );
+    outline: none;
+    cursor: pointer;
+  }
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid var(--color-iris);
+    box-shadow: 0 0 12px rgba(110, 84, 255, 0.6);
+  }
+  .slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid var(--color-iris);
+    box-shadow: 0 0 12px rgba(110, 84, 255, 0.6);
+  }
+  .slider:focus-visible {
+    box-shadow: 0 0 0 3px rgba(110, 84, 255, 0.25);
+  }
+
+  .spinner-ui {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    border-top-color: #fff;
+    animation: spin-ui 0.7s linear infinite;
+  }
+}
+
+@keyframes spin-ui {
+  to { transform: rotate(360deg); }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass {
+    background: var(--color-raised);
+  }
+}
+
+/* ================= backdrop layer stack ================= */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(1200px 640px at 78% -12%, rgba(110, 84, 255, 0.17), transparent 62%),
+    radial-gradient(900px 520px at 12% 108%, rgba(110, 84, 255, 0.08), transparent 60%),
+    linear-gradient(180deg, var(--color-abyss) 0%, var(--color-void) 46%);
+}
+
+.backdrop-orb {
+  position: absolute;
+  width: 58vmax;
+  height: 58vmax;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.5;
+}
+.backdrop-orb-a {
+  top: -24vmax;
+  right: -16vmax;
+  background: radial-gradient(circle, rgba(110, 84, 255, 0.3), transparent 64%);
+}
+.backdrop-orb-b {
+  bottom: -28vmax;
+  left: -18vmax;
+  background: radial-gradient(circle, rgba(155, 135, 255, 0.14), transparent 64%);
+}
+
+.backdrop-grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.ember-field {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* ================= shared keyframes (motion-safe) ================= */
+
+@media (prefers-reduced-motion: no-preference) {
+  .backdrop-orb-a {
+    animation: orb-a 28s ease-in-out infinite alternate;
+  }
+  .backdrop-orb-b {
+    animation: orb-b 34s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes orb-a {
+  from { transform: translate(0, 0) scale(1); }
+  to { transform: translate(-6vmax, 5vmax) scale(1.12); }
+}
+@keyframes orb-b {
+  from { transform: translate(0, 0) scale(1.05); }
+  to { transform: translate(5vmax, -4vmax) scale(0.95); }
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(110, 84, 255, 0.5); }
+  50% { opacity: 0.7; box-shadow: 0 0 0 5px rgba(110, 84, 255, 0); }
+}
