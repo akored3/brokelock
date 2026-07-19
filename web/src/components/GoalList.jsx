@@ -70,25 +70,24 @@ export default function GoalList({ goals, now, busy, send, deleted, onDelete }) 
             {settled.map(([g, i]) => (
               <div
                 key={i}
-                className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-2.5 text-sm text-ink-dim"
+                className="flex items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-2.5 text-sm text-ink-dim"
               >
-                <span className="inline-flex items-center gap-2 font-medium">
+                <span className="inline-flex min-w-0 flex-1 items-center gap-2 font-medium">
                   <Check size={13} className="shrink-0 text-success" />
-                  {g.name}
+                  <span className="truncate">{g.name}</span>
                 </span>
-                <span className="inline-flex items-center gap-1.5">
-                  {/* onchain data can't tell a full withdrawal from a lapsed empty goal, so just "closed" */}
-                  <span className="font-mono text-xs text-ink-faint">
-                    penalty {g.penaltyBps / 100}% · closed
-                  </span>
-                  <IconButton
-                    disabled={busy !== null}
-                    onClick={() => onDelete(i)}
-                    aria-label={`Delete ${g.name}`}
-                  >
-                    <Trash2 size={14} />
-                  </IconButton>
+                {/* onchain data can't tell a full withdrawal from a lapsed empty goal, so just "closed" */}
+                <span className="shrink-0 font-mono text-xs text-ink-faint">
+                  penalty {g.penaltyBps / 100}% · closed
                 </span>
+                {/* -my-2 keeps the row slim; before:-inset-1 pads the tap area to ~44px */}
+                <IconButton
+                  className="relative -my-2 shrink-0 p-2.5 before:absolute before:-inset-1"
+                  onClick={() => onDelete(i)}
+                  aria-label={`Delete ${g.name}`}
+                >
+                  <Trash2 size={16} />
+                </IconButton>
               </div>
             ))}
           </div>

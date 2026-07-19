@@ -57,11 +57,11 @@ export default function App() {
     }
   }, [account]);
 
-  const deleteGoal = useCallback(
-    (goalId) => {
+  const mutateDeleted = useCallback(
+    (mutate) => {
       setDeleted((prev) => {
         const next = new Set(prev);
-        next.add(goalId);
+        mutate(next);
         if (!DEMO && account) {
           try {
             localStorage.setItem(
@@ -77,6 +77,9 @@ export default function App() {
     },
     [account],
   );
+
+  const deleteGoal = useCallback((goalId) => mutateDeleted((s) => s.add(goalId)), [mutateDeleted]);
+  const restoreGoal = useCallback((goalId) => mutateDeleted((s) => s.delete(goalId)), [mutateDeleted]);
 
   const say = (kind, text) => {
     clearTimeout(noticeTimer.current);
@@ -280,7 +283,21 @@ export default function App() {
                   deleted={deleted}
                   onDelete={(goalId) => {
                     deleteGoal(goalId);
-                    say('ok', 'Deleted. The chain remembers it; this page won’t.');
+                    say('ok', (
+                      <>
+                        Deleted. The chain remembers it; this page won’t.{' '}
+                        <button
+                          type="button"
+                          className="cursor-pointer font-medium text-success underline"
+                          onClick={() => {
+                            restoreGoal(goalId);
+                            setNotice(null);
+                          }}
+                        >
+                          Undo
+                        </button>
+                      </>
+                    ));
                   }}
                   onClaim={() => send('claim', 'claim', [], undefined, 'Penalties claimed. Enjoy their weakness.')}
                 />

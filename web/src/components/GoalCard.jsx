@@ -166,12 +166,11 @@ export default function GoalCard({ goal, goalId, now, busy, send, onDelete }) {
 
         {goal.balance === 0n && (
           <IconButton
-            className="self-center"
-            disabled={busy !== null}
+            className="relative self-center p-2.5 before:absolute before:-inset-1"
             onClick={() => onDelete(goalId)}
             aria-label={`Delete ${goal.name}`}
           >
-            <Trash2 size={14} />
+            <Trash2 size={16} />
           </IconButton>
         )}
 
